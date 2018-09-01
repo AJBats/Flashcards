@@ -15,8 +15,11 @@ namespace Flashcards
     {
         public List<String> answerSet = new List<string>();
         public String[] questionSet;
+        public String rightAnswerText;
         public int rightAnswer = 0;
         public int previousQuestion = -1;
+        public int textAnswerStrikes = 0;
+        
 
         public Form1()
         {
@@ -28,9 +31,16 @@ namespace Flashcards
 
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
-            this.Size = new System.Drawing.Size(820, 500);            
+            this.Size = new System.Drawing.Size(820, 500);
 
+            button1.Show();
+            button2.Show();
+            button3.Show();
 
+            answerTextBox.Hide();
+            typeAnswerResponse.Hide();
+            
+            typeAnswerResponse.Text = "";            
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -140,8 +150,9 @@ namespace Flashcards
         {
             Random rnd = new Random();
             List<String> answerSetCopy = new List<String>();
+            
 
-            foreach(String s in answerSet)
+            foreach (String s in answerSet)
             {
                 answerSetCopy.Add(s);
             }
@@ -158,7 +169,9 @@ namespace Flashcards
                     throw new System.Exception("Infinite loop detected.");
                 }
             }
+
             rightAnswer = rnd.Next(0, 3);
+            rightAnswerText = answerSet[randoQuestion];
 
             pictureBox1.Image = Image.FromFile(questionSet[randoQuestion]);
 
@@ -166,25 +179,30 @@ namespace Flashcards
             this.button2.ForeColor = Color.Black;
             this.button3.ForeColor = Color.Black;
 
+            textAnswerStrikes = 0;
+            answerTextBox.Text = "";
+            typeAnswerResponse.Text = "";
+            typeAnswerResponse.ForeColor = Color.Black;
+
 
             switch (rightAnswer)
             {
                 case 0:
-                    button1.Text = answerSet[randoQuestion];
+                    button1.Text = rightAnswerText;
                     answerSetCopy.Remove(button1.Text);
                     button2.Text = answerSetCopy[rnd.Next(0, answerSetCopy.Count)];
                     answerSetCopy.Remove(button2.Text);
                     button3.Text = answerSetCopy[rnd.Next(0, answerSetCopy.Count)];
                     break;
                 case 1:
-                    button2.Text = answerSet[randoQuestion];
+                    button2.Text = rightAnswerText;
                     answerSetCopy.Remove(button2.Text);
                     button1.Text = answerSetCopy[rnd.Next(0, answerSetCopy.Count)];
                     answerSetCopy.Remove(button1.Text);
                     button3.Text = answerSetCopy[rnd.Next(0, answerSetCopy.Count)];
                     break;
                 case 2:
-                    button3.Text = answerSet[randoQuestion];
+                    button3.Text = rightAnswerText;
                     answerSetCopy.Remove(button3.Text);
                     button1.Text = answerSetCopy[rnd.Next(0, answerSetCopy.Count)];
                     answerSetCopy.Remove(button1.Text);
@@ -196,6 +214,63 @@ namespace Flashcards
             }
 
             previousQuestion = randoQuestion;
+        }
+
+        private void answerTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void answerTextBox_KeyDownHandler(object sender, KeyPressEventArgs e)
+        {
+
+        }
+
+        private void answerTextBox_HandleKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                if(answerTextBox.Text == rightAnswerText)
+                {
+                    // ding ding
+                    SetupQuestion();
+                }
+                else
+                {
+                    textAnswerStrikes++;
+                    if(textAnswerStrikes >= 3)
+                    {
+                        typeAnswerResponse.Text = rightAnswerText;
+                        typeAnswerResponse.ForeColor = Color.Red;
+                    }
+                    else
+                    {
+                        typeAnswerResponse.Text = "STRIKE " + textAnswerStrikes;
+                    }
+                }
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            // select multi choice
+            button1.Show();
+            button2.Show();
+            button3.Show();
+
+            answerTextBox.Hide();
+            typeAnswerResponse.Hide();            
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            // select text answer.
+            button1.Hide();
+            button2.Hide();
+            button3.Hide();
+
+            answerTextBox.Show();
+            typeAnswerResponse.Show();
         }
     }
 }
